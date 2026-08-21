@@ -22,6 +22,8 @@
 * `@Test shouldReturnQueryString()` tests the RAG LLM output
 * The query string can be passed using `mvn test -Dspring.ai.query="Spring AI Query"`
 * Using Java 21/SpringA1 2.0.0
+## Testing results
+<img width="1920" height="1128" alt="image" src="https://github.com/user-attachments/assets/e606714c-62ab-424f-b59f-4e6545a2a88d" />
 
 ## DESIGN
 How to keep answer quality from degrading as the document library grows to tens of thousands of files.
