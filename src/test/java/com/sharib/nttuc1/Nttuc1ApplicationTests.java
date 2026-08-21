@@ -5,8 +5,12 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +34,7 @@ import java.nio.file.Path;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class Nttuc1ApplicationTests {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -38,10 +43,12 @@ class Nttuc1ApplicationTests {
 	String fileUploadEndPoint = "/api/docs/upload";
 	String queryEndPoint = "/api/docs/query/{text}";
 
+	@Order(1)
 	@Test
 	void contextLoads() {
 	}
 
+	@Order(2)
 	@Test
 	void shouldUploadPdfSuccessfully() throws Exception {
 		log.info("shouldUploadPdfSuccessfully");
@@ -111,6 +118,7 @@ class Nttuc1ApplicationTests {
 		}
 	}
 
+	@Order(3)
 	@Test
 	void shouldUploadTextSuccessfully() throws Exception {
 		log.info("shouldUploadTextSuccessfully");
@@ -138,6 +146,7 @@ class Nttuc1ApplicationTests {
 		log.info("responseBody = " + responseBody);
 	}
 
+	@Order(4)
 	@Test
 	void shouldRejectNonPdfNonTextFile() throws Exception {
 		log.info("shouldRejectNonPdfNonTextFile");
@@ -157,6 +166,7 @@ class Nttuc1ApplicationTests {
 		log.info("responseBody = " + responseBody);
 	}
 
+	@Order(5)
 	@Test
 	void shouldRejectEmptyFile() throws Exception {
 		log.info("shouldRejectEmptyFile");
@@ -176,6 +186,7 @@ class Nttuc1ApplicationTests {
 		log.info("responseBody = " + responseBody);
 	}
 
+	@Order(6)
 	@Test
 	void shouldRejectLargeFile() throws Exception {
 		log.info("shouldRejectLargeFile");
@@ -196,18 +207,17 @@ class Nttuc1ApplicationTests {
 		log.info("responseBody = " + responseBody);
 	}
 
+	@Order(7)
 	@Test
 	void shouldReturnQueryString() throws Exception {
-		log.info("shouldReturnQueryString");
+		String springAIQuery = System.getProperty("spring.ai.query");
+		log.info("shouldReturnQueryString: springAIQuery: " + springAIQuery);
 		// Create a mock PNG file instead of a PDF
-		String query = "Insurance claim";
-		String responseBody = mockMvc.perform(get(queryEndPoint, query)
-						.param(query))
+		String responseBody = mockMvc.perform(get(queryEndPoint, springAIQuery))
 				.andExpect(status().isOk())
 				.andReturn() // Completes execution and returns MvcResult
 				.getResponse()
 				.getContentAsString();
 		log.info("responseBody = " + responseBody);
 	}
-
 }

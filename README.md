@@ -16,7 +16,13 @@
 * `@Test shouldRejectEmptyFile()` to test for empty file upload
 * `@Test shouldRejectLargeFile()` to test for large file upload (> 1MB)
 * Created PDF files using Apache PDFBox
-* Decided to run local LLM due to API keys (not free and models not easily accessible)
+* Decided to run local ollama mistral LLM due to API keys (not free and models not easily accessible)
 * Running ollama mistral in Docker using docker-compose (this setup took some time due docker-compose issues)
 * `docker exec -it ollama ollama pull mistral` to pull ollama mistral model
-* Using Java 21
+* `@Test shouldReturnQueryString()` tests the RAG LLM output
+* The query string can be passed using `mvn test -Dspring.ai.query="Spring AI Query"`
+* Using Java 21/SpringA1 2.0.0
+
+## DESIGN
+How to keep answer quality from degrading as the document library grows to tens of thousands of files.
+

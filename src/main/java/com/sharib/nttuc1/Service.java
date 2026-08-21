@@ -5,6 +5,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -75,13 +76,27 @@ public class Service {
 
 	public String queryDocuments(String text) {
 		log.info("queryDocuments : " + text);
+		//check for empty library
+		String responseString = null;
+		SearchRequest request = SearchRequest.builder()
+				.query("Spring AI")
+				.topK(1)
+				.build();
+		List<Document> docs = vectorStore.similaritySearch(request);
+		if (docs.isEmpty()) {
+			responseString = "The library is empty. Please add documents.";
+			log.info("queryDocuments : " + responseString);
+			return responseString;
+		} else {
+			log.info("queryDocuments : Library size = " + docs.size());
+		}
 		ChatResponse response = ChatClient.builder(chatModel)
 				.build().prompt()
 				.advisors(QuestionAnswerAdvisor.builder(vectorStore).build())
 				.user(text)
 				.call()
 				.chatResponse();
-		String responseString = response.getResult().getOutput().getText();
+		responseString = response.getResult().getOutput().getText();
 		log.info("queryDocuments : responseString : " + responseString);
 		return responseString;
 	}
