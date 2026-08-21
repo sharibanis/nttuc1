@@ -1,22 +1,20 @@
 package com.sharib.nttuc1;
 
-import com.openai.models.vectorstores.VectorStore;
+import org.apache.tika.Tika;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
-import org.springframework.ai.content.Media;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ai.document.Document;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MimeType;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,25 +23,66 @@ public class Service {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	private SimpleVectorStore vectorStore;
+	private ChatModel chatModel;
 
 	//private Repository repository;
 
-	public Service(SimpleVectorStore vectorStore) {
+	public Service(SimpleVectorStore vectorStore, ChatModel chatModel) {
 		this.vectorStore = vectorStore;
+		this.chatModel = chatModel;
 	}
 
 	void uploadDocument(MultipartFile file) throws Exception {
-		log.info("uploadDocument : " + file.getName());
+		log.info("uploadDocument : " + file.getOriginalFilename());
 		Document document = null;
 		String contentType = file.getContentType();
-		if (contentType.equals(MediaType.APPLICATION_PDF_VALUE)) {
-			Resource pdfResource  = new InputStreamResource(file.getInputStream());
-			Media pdfMedia = new Media(MimeType.valueOf(MediaType.APPLICATION_PDF_VALUE),
-					pdfResource);
-			document = new Document(pdfMedia, Map.of("type", "pdf"));
+		String extractedText = null;
+		PDDocument pdfDocument = new PDDocument();
+		Tika tika = new Tika();
+		boolean isPdf = Objects.equals(tika.detect(file.getBytes()), "application/pdf");
+		boolean isText = Objects.equals(tika.detect(file.getBytes()), "text/plain");
+		if (isPdf) {
+			log.info("uploadDocument : isPdf : " + isPdf);
+			try {
+				if (contentType.equals(MediaType.APPLICATION_PDF_VALUE)) {
+					pdfDocument = Loader.loadPDF(file.getBytes());
+					PDFTextStripper pdfStripper = new PDFTextStripper();
+					extractedText = pdfStripper.getText(pdfDocument);
+					log.info("extractedText  : " + extractedText);
+					document = new Document(extractedText);
+				}
+				List<Document> documents = List.of(document);
+				log.info("Saving {} on SimpleVectorStore...", file.getOriginalFilename());
+				vectorStore.add(documents);
+			} finally {
+				if (pdfDocument != null) {
+					pdfDocument.close();
+				}
+			}
+		} else if (isText) {
+			log.info("uploadDocument : isText : " + isText);
+			extractedText = new String(file.getBytes());
+			document = new Document(extractedText);
+			List<Document> documents = List.of(document);
+			log.info("Saving {} on SimpleVectorStore...", file.getOriginalFilename());
+			vectorStore.add(documents);
+		} else {
+			String msg = "Not a valid PDF or text file: " + file.getOriginalFilename();
+			log.error(msg);
+			throw new Exception(msg);
 		}
-		List<Document> documents = new ArrayList<Document>();
-		documents.add(document);
-		vectorStore.add(documents);
+	}
+
+	public String queryDocuments(String text) {
+		log.info("queryDocuments : " + text);
+		ChatResponse response = ChatClient.builder(chatModel)
+				.build().prompt()
+				.advisors(QuestionAnswerAdvisor.builder(vectorStore).build())
+				.user(text)
+				.call()
+				.chatResponse();
+		String responseString = response.getResult().getOutput().getText();
+		log.info("queryDocuments : responseString : " + responseString);
+		return responseString;
 	}
 }

@@ -1,15 +1,13 @@
 package com.sharib.nttuc1;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
@@ -40,6 +38,12 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Upload failed: Please select a file to upload.");
         }
+	    long largeFileContent = 1024 * 10;
+	    if (file.getSize() > largeFileContent) {
+		    log.error("Upload failed: file.getSize() = " + file.getSize());
+		    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				    .body("Upload failed: Please select a smaller file to upload.");
+	    }
 
         // 2. Validate file type (PDF or TXT)
         String contentType = file.getContentType();
@@ -59,10 +63,17 @@ public class Controller {
 	        log.info("Uploaded file: " + file.getOriginalFilename());
             return ResponseEntity.ok(String.format("File '%s' (%d bytes) uploaded successfully!", fileName, fileSize));
         } catch (Exception e) {
-			log.error("Error while uploading file: " + file.getOriginalFilename(), e.toString());
+	        log.error("Error while uploading file: {}", file.getOriginalFilename(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Upload failed due to a server error: " + e.getMessage());
+                    .body("Upload failed due to a server error.");
         }
     }
+
+	@GetMapping("/query/{text}")
+	public String queryDocuments(@PathVariable String text) {
+		log.info("queryDocuments: " + text);
+		return service.queryDocuments(text);
+	}
+
 
 }
