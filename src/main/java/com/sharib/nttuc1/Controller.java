@@ -1,7 +1,5 @@
 package com.sharib.nttuc1;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +55,6 @@ public class Controller {
             // 3. Process the file (Example: Log metadata or extract bytes)
             String fileName = file.getOriginalFilename();
             long fileSize = file.getSize();
-            byte[] fileBytes = file.getBytes();
             // save file to SimpleVectorStore
 	        service.uploadDocument(file);
 	        log.info("Uploaded file: " + file.getOriginalFilename());
