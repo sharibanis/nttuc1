@@ -211,6 +211,9 @@ class Nttuc1ApplicationTests {
 	@Test
 	void shouldReturnQueryString() throws Exception {
 		String springAIQuery = System.getProperty("spring.ai.query");
+		if (springAIQuery == null) {
+			springAIQuery = "Spring AI Query";
+		}
 		log.info("shouldReturnQueryString: springAIQuery: " + springAIQuery);
 		// Create a mock PNG file instead of a PDF
 		String responseBody = mockMvc.perform(get(queryEndPoint, springAIQuery))
