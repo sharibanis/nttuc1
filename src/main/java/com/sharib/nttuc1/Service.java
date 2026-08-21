@@ -8,7 +8,6 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.pdfbox.Loader;
