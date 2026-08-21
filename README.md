@@ -25,4 +25,10 @@
 
 ## DESIGN
 How to keep answer quality from degrading as the document library grows to tens of thousands of files.
+**Key Strategies for Scaling**
+**Smart Chunking**: Break large files into small, logical sections of 300 to 500 tokens so search tools find exact passages fast.
+**Hybrid Search**: Combine keyword search (BM25) with vector search to match exact product codes and catch semantic meaning.
+**Metadata Tagging**: Add tags like date, author, and category to filter out irrelevant files before searching.
+**Cross-Encoder Re-ranking**: Use a second-stage re-ranker to score and sort the top 50 search results by true relevance before sending them to the language model.
+**Regular Evaluation:** Run automated test sets every week to track retrieval score (Hit Rate) and answer correctness as data grows.
 
