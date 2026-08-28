@@ -22,6 +22,8 @@
 * `@GetMapping queryDocuments(@PathVariable String queryText)` to query documents
 * `@Test shouldReturnQueryString()` tests the RAG LLM output
 * The query string can be passed using `mvn test -Dspring.ai.query="Spring AI Query"`
+* File upload end point is `/api/docs/upload`
+* AI query end point is `/api/docs/query/{queryText}`;
 * Using Java 21/SpringA1 2.0.0
 
 ## Instructions
