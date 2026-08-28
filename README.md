@@ -5,7 +5,7 @@
 * `SpringBootApplication` with logging 
 * Using local Ollama and embedded SimpleVectorStore for faster setup and startup
 * `@PostMapping uploadDocument(@RequestParam("file") MultipartFile file)` to upload files
-* Checking for text and PDF files
+* Checking for text and PDF files. Only text and PDF files allowed to be uploaded.
 * Extracted text from PDF files using Apache PDFBox and stored in SimpleVectorStore
 * Text files are much smaller in size and faster to RAG process than PDF 
 * In Retrieval-Augmented Generation (RAG), using plain text files (.txt) is fast and 
