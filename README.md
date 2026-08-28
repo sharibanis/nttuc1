@@ -19,6 +19,7 @@
 * Decided to run local ollama mistral LLM due to API keys (not free and models not easily accessible)
 * Running ollama mistral in Docker using docker-compose (this setup took some time due docker-compose issues)
 * `docker exec -it ollama ollama pull mistral` to pull ollama mistral model
+* `@GetMapping queryDocuments(@PathVariable String queryText)` to query documents
 * `@Test shouldReturnQueryString()` tests the RAG LLM output
 * The query string can be passed using `mvn test -Dspring.ai.query="Spring AI Query"`
 * Using Java 21/SpringA1 2.0.0
