@@ -9,7 +9,7 @@
 * Extracted text from PDF files using Apache PDFBox and stored in SimpleVectorStore
 * Text files are much smaller in size and faster to RAG process than PDF 
 * In Retrieval-Augmented Generation (RAG), using plain text files (.txt) is fast and 
-* clean because the data is already flat and ready to chunk.
+  clean because the data is already flat and ready to chunk.
 * `@Test shouldUploadPdfSuccessfully()` to test for PDF file upload
 * `@Test shouldUploadTextSuccessfully()` to test for text file upload
 * `@Test shouldRejectNonPdfNonTextFile()` to test for non PDF and non text file upload
@@ -22,8 +22,8 @@
 * `@GetMapping queryDocuments(@PathVariable String queryText)` to query documents
 * `@Test shouldReturnQueryString()` tests the RAG LLM output
 * The query string can be passed using `mvn test -Dspring.ai.query="Spring AI Query"`
-* File upload end point is `/api/docs/upload`
-* AI query end point is `/api/docs/query/{queryText}`;
+* File upload end point is: `/api/docs/upload`
+* AI query end point is: `/api/docs/query/{queryText}`
 * Using Java 21/SpringA1 2.0.0
 
 ## Instructions
